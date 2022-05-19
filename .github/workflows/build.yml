@@ -3,7 +3,7 @@ on:
     branches: [master]
 
 jobs:
-  Build-Check:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,8 +12,8 @@ jobs:
           node-version: 14
       - name: Installing Dependencies
         run: yarn install
-      - name: Trying to Build
-        run: yarn build
+      - name: Running Test
+        run: CI=true yarn test
   Deploy:  
     runs-on: ubuntu-latest
     steps:
