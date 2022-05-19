@@ -14,8 +14,9 @@ jobs:
         run: yarn install
       - name: Running Test
         run: CI=true yarn test
-  Deploy:  
+  Deploy:
     runs-on: ubuntu-latest
+    needs: Test
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
