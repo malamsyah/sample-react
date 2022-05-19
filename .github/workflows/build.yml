@@ -14,7 +14,7 @@ jobs:
         run: yarn install
       - name: Running Test
         run: CI=true yarn test
-  Deploy:
+  DeployStaging:
     runs-on: ubuntu-latest
     needs: Test
     steps:
@@ -28,7 +28,32 @@ jobs:
         uses: nwtgck/actions-netlify@v1.2
         with:
           publish-dir: './build'
-          production-branch: master
+          production-deploy: false
+          github-token: ${{ secrets.TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 1
+  DeployProduction:
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    needs: [Test, DeployIntegration]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+      - name: Installing Dependencies
+        run: yarn install
+      - name: Trying to Build
+        run: yarn build
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.2
+        with:
+          publish-dir: './build'
+          production-deploy: true
           github-token: ${{ secrets.TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
           enable-pull-request-comment: false
